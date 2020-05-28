@@ -25,10 +25,7 @@ import co.rsk.core.bc.BlockChainStatus;
 import co.rsk.crypto.Keccak256;
 import co.rsk.db.RepositoryLocator;
 import co.rsk.db.RepositorySnapshot;
-import co.rsk.net.light.LightPeer;
-import co.rsk.net.light.LightProcessor;
-import co.rsk.net.light.LightStatus;
-import co.rsk.net.light.LightSyncProcessor;
+import co.rsk.net.light.*;
 import co.rsk.net.light.message.*;
 import co.rsk.vm.BytecodeCompiler;
 import io.netty.channel.ChannelHandlerContext;
@@ -71,6 +68,7 @@ public class LightClientHandlerTest {
     private Keccak256 genesisHash;
     private Keccak256 blockHash;
     private LightPeer lightPeer;
+    private LightMessageHandler lightMessageHandler;
 
     @Before
     public void setup() {
@@ -84,7 +82,8 @@ public class LightClientHandlerTest {
         lightProcessor = new LightProcessor(blockchain, blockStore, repositoryLocator);
         lightSyncProcessor = new LightSyncProcessor(config, genesis, blockStore, blockchain);
         lightPeer = spy(new LightPeer(mock(Channel.class), messageQueue));
-        LightClientHandler.Factory factory = (lightPeer) -> new LightClientHandler(lightPeer, lightProcessor, lightSyncProcessor);
+        lightMessageHandler = mock(LightMessageHandler.class);
+        LightClientHandler.Factory factory = (lightPeer) -> new LightClientHandler(lightPeer, lightSyncProcessor, lightMessageHandler);
         lightClientHandler = factory.newInstance(lightPeer);
         blockHash = new Keccak256(HashUtil.randomHash());
 

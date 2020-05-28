@@ -22,10 +22,7 @@ import co.rsk.core.BlockDifficulty;
 import co.rsk.core.bc.BlockChainStatus;
 import co.rsk.crypto.Keccak256;
 import co.rsk.net.eth.LightClientHandler;
-import co.rsk.net.light.LightPeer;
-import co.rsk.net.light.LightProcessor;
-import co.rsk.net.light.LightStatus;
-import co.rsk.net.light.LightSyncProcessor;
+import co.rsk.net.light.*;
 import co.rsk.net.light.message.BlockHeaderMessage;
 import co.rsk.net.light.message.GetBlockHeaderMessage;
 import co.rsk.net.light.message.StatusMessage;
@@ -99,7 +96,8 @@ public class LightSyncProcessorTest {
     public void processStatusMessageAndShouldAskForAndReceiveBlockHeaderCorrectly() {
 
         LightProcessor lightProcessor = mock(LightProcessor.class);
-        LightClientHandler lightClientHandler = new LightClientHandler(lightPeer, lightProcessor, lightSyncProcessor);
+        LightMessageHandler lightMessageHandler = new LightMessageHandler(lightProcessor, lightSyncProcessor);
+        LightClientHandler lightClientHandler = new LightClientHandler(lightPeer, lightSyncProcessor, lightMessageHandler);
 
         EmbeddedChannel ch = new EmbeddedChannel();
         ch.pipeline().addLast(lightClientHandler);
