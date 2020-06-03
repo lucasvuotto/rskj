@@ -121,28 +121,10 @@ public class LightSyncProcessorTest {
 
         BlockHeaderMessage blockHeaderMessage = new BlockHeaderMessage(requestId, blockHeader);
 
-
-        lightClientHandler.channelRead0(ctx, blockHeaderMessage);
+        lightMessageHandler.processMessage(lightPeer, blockHeaderMessage, ctx, lightClientHandler);
 
         assertEquals(1, lightPeer.getBlocks().size());
         assertEquals(blockHeader.getFullEncoded(), lightPeer.getBlocks().get(0).getFullEncoded());
-    }
-
-    @Test
-    public void morePeersThanAllowedTryToConnectToMeAndShouldBeDiscarded() {
-        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
-        LightClientHandler lightClientHandler = mock(LightClientHandler.class);
-
-        //Message sent
-        long requestId = 0; //lastRequestId in a new LightSyncProcessor starts in zero.
-        StatusMessage statusMessage = new StatusMessage(requestId, lightStatus, false);
-
-        LightPeer lightPeer2 = mock(LightPeer.class);
-        lightSyncProcessor.processStatusMessage(statusMessage, lightPeer, ctx, lightClientHandler);
-        lightSyncProcessor.processStatusMessage(statusMessage, lightPeer2, ctx, lightClientHandler);
-
-        verify(lightPeer, times(1)).sendMessage(any());
-        verify(lightPeer2, times(0)).sendMessage(any());
     }
 
     @Test
