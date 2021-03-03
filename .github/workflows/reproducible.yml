@@ -1,0 +1,34 @@
+name: Reproducible build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    container: 
+      image: openjdk@sha256:516d7f9fe280794f04804f89c008f89ed39a4cb709f78f21dbad5385641a0b2f
+    steps:
+      - name: Install packages
+        run: |
+          apt-get update -y && apt-get install -y git curl gnupg
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set rskj version
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Download Release key
+        run: |
+          gpg --keyserver https://secchannel.rsk.co/release.asc --recv-keys 1A92D8942171AFA951A857365DECF4415E3B8FA4
+      - name: Verify files integrity
+        run: |
+          gpg --verify --output SHA256SUMS SHA256SUMS.asc && sha256sum --check SHA256SUMS
+      - name: Build rskj
+        run: |
+          ./configure.sh && ./gradlew --no-daemon clean build -x test
+      - name: Calculate hashes
+        working-directory: rskj-core/build/libs
+        run: |
+          sha256sum * > SHA256SUMS
+      - name: Print hashes
+        run: |
+          cat rskj-core/build/libs/SHA256SUMS
+      - name: Export artifacts
