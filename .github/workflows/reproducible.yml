@@ -32,3 +32,8 @@ jobs:
         run: |
           cat rskj-core/build/libs/SHA256SUMS
       - name: Export artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: rskj-${{ steps.vars.outputs.tag }}
+          path: rskj-core/build/libs/
+          if-no-files-found: error
