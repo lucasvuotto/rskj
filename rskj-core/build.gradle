@@ -127,7 +127,7 @@ task generateResources {
         def currentBranch = gitCurrentBranch()
         generated.text = """
 build.hash=$commitHash
-build.branch=$currentBranch
+build.branch=HARDCODED_VALUE_TO_FIX_REPRODUCIBLE_BUILDS
 """
     }
 }
@@ -152,10 +152,10 @@ task javadocJar(type: Jar) {
 jar {
     def commitHash = gitCommitHash()
     def currentBranch = gitCurrentBranch()
-    manifest {
+    /*manifest {
         attributes  'Git-Commit': commitHash,
                     'Git-Branch': currentBranch
-    }
+    }*/
     from sourceSets.main.output.classesDirs
     from sourceSets.main.output.resourcesDir
     from generatedResources
